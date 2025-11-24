@@ -1,0 +1,50 @@
+defmodule Bosbase.BackupService do
+  @moduledoc "Backup management helpers."
+  alias Bosbase.Utils
+
+  def get_full_list(client, query \\ %{}, headers \\ %{}) do
+    client.send("/api/backups", %{query: query, headers: headers})
+  end
+
+  def create(client, name, body \\ %{}, query \\ %{}, headers \\ %{}) do
+    payload = Map.put(Map.new(body || %{}), "name", name)
+    client.send("/api/backups", %{method: :post, body: payload, query: query, headers: headers})
+  end
+
+  def upload(client, files, body \\ %{}, query \\ %{}, headers \\ %{}) do
+    client.send("/api/backups/upload", %{
+      method: :post,
+      body: body,
+      query: query,
+      headers: headers,
+      files: files
+    })
+  end
+
+  def delete(client, key, body \\ %{}, query \\ %{}, headers \\ %{}) do
+    client.send("/api/backups/" <> Utils.encode_path_segment(key), %{
+      method: :delete,
+      body: body,
+      query: query,
+      headers: headers
+    })
+    |> case do
+      {:ok, _} -> :ok
+      other -> other
+    end
+  end
+
+  def restore(client, key, body \\ %{}, query \\ %{}, headers \\ %{}) do
+    client.send("/api/backups/#{Utils.encode_path_segment(key)}/restore", %{
+      method: :post,
+      body: body,
+      query: query,
+      headers: headers
+    })
+  end
+
+  def get_download_url(client, token, key, query \\ %{}) do
+    params = Map.put(Map.new(query || %{}), "token", token)
+    client.build_url("/api/backups/#{Utils.encode_path_segment(key)}", params)
+  end
+end
