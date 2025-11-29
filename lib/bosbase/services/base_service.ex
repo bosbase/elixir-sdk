@@ -1,6 +1,6 @@
 defmodule Bosbase.BaseCrudService do
   @moduledoc false
-  alias Bosbase.{ClientResponseError, Utils}
+  alias Bosbase.{Client, ClientResponseError, Utils}
 
   defstruct [:client, :path_fun]
 
@@ -67,7 +67,7 @@ defmodule Bosbase.BaseCrudService do
       |> maybe_put(options, [:expand, "expand"], "expand")
       |> maybe_put(options, [:fields, "fields"], "fields")
 
-    crud.client.send(base_path(crud), %{
+    Client.send(crud.client, base_path(crud), %{
       method: :get,
       query: params,
       headers: options[:headers] || options["headers"]
@@ -79,7 +79,7 @@ defmodule Bosbase.BaseCrudService do
   def get_one(crud, record_id, _opts) when record_id in [nil, ""] do
     {:error,
      %ClientResponseError{
-       url: crud.client.build_url(base_path(crud) <> "/", %{}),
+       url: Client.build_url(crud.client, base_path(crud) <> "/", %{}),
        status: 404,
        response: %{
          "code" => 404,
@@ -100,7 +100,7 @@ defmodule Bosbase.BaseCrudService do
 
     encoded = Utils.encode_path_segment(record_id)
 
-    crud.client.send("#{base_path(crud)}/#{encoded}", %{
+    Client.send(crud.client, "#{base_path(crud)}/#{encoded}", %{
       method: :get,
       query: params,
       headers: options[:headers] || options["headers"]
@@ -152,7 +152,7 @@ defmodule Bosbase.BaseCrudService do
       |> maybe_put(options, [:expand, "expand"], "expand")
       |> maybe_put(options, [:fields, "fields"], "fields")
 
-    crud.client.send(base_path(crud), %{
+    Client.send(crud.client, base_path(crud), %{
       method: :post,
       body: options[:body] || options["body"],
       query: params,
@@ -173,7 +173,7 @@ defmodule Bosbase.BaseCrudService do
 
     encoded = Utils.encode_path_segment(record_id)
 
-    crud.client.send("#{base_path(crud)}/#{encoded}", %{
+    Client.send(crud.client, "#{base_path(crud)}/#{encoded}", %{
       method: :patch,
       body: options[:body] || options["body"],
       query: params,
@@ -187,7 +187,7 @@ defmodule Bosbase.BaseCrudService do
     options = opts || %{}
     encoded = Utils.encode_path_segment(record_id)
 
-    crud.client.send("#{base_path(crud)}/#{encoded}", %{
+    Client.send(crud.client, "#{base_path(crud)}/#{encoded}", %{
       method: :delete,
       body: options[:body] || options["body"],
       query: options[:query] || options["query"],

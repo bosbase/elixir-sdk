@@ -1,15 +1,15 @@
 defmodule Bosbase.LLMDocumentService do
   @moduledoc "LLM document collection helpers."
-  alias Bosbase.Utils
+  alias Bosbase.{Client, Utils}
 
   @base "/api/llm-documents"
 
   def list_collections(client, query \\ %{}, headers \\ %{}) do
-    client.send(@base <> "/collections", %{query: query, headers: headers})
+    Client.send(client, @base <> "/collections", %{query: query, headers: headers})
   end
 
   def create_collection(client, name, metadata \\ %{}, query \\ %{}, headers \\ %{}) do
-    client.send(@base <> "/collections/#{Utils.encode_path_segment(name)}", %{
+    Client.send(client, @base <> "/collections/#{Utils.encode_path_segment(name)}", %{
       method: :post,
       body: %{"metadata" => metadata},
       query: query,
@@ -18,7 +18,7 @@ defmodule Bosbase.LLMDocumentService do
   end
 
   def delete_collection(client, name, query \\ %{}, headers \\ %{}) do
-    client.send(@base <> "/collections/#{Utils.encode_path_segment(name)}", %{
+    Client.send(client, @base <> "/collections/#{Utils.encode_path_segment(name)}", %{
       method: :delete,
       query: query,
       headers: headers
@@ -30,7 +30,7 @@ defmodule Bosbase.LLMDocumentService do
   end
 
   def insert(client, collection, doc, query \\ %{}, headers \\ %{}) do
-    client.send(collection_path(collection), %{
+    Client.send(client, collection_path(collection), %{
       method: :post,
       body: doc,
       query: query,
@@ -39,14 +39,14 @@ defmodule Bosbase.LLMDocumentService do
   end
 
   def get(client, collection, document_id, query \\ %{}, headers \\ %{}) do
-    client.send(collection_path(collection) <> "/#{Utils.encode_path_segment(document_id)}", %{
+    Client.send(client, collection_path(collection) <> "/#{Utils.encode_path_segment(document_id)}", %{
       query: query,
       headers: headers
     })
   end
 
   def update(client, collection, document_id, doc, query \\ %{}, headers \\ %{}) do
-    client.send(collection_path(collection) <> "/#{Utils.encode_path_segment(document_id)}", %{
+    Client.send(client, collection_path(collection) <> "/#{Utils.encode_path_segment(document_id)}", %{
       method: :patch,
       body: doc,
       query: query,
@@ -55,7 +55,7 @@ defmodule Bosbase.LLMDocumentService do
   end
 
   def delete(client, collection, document_id, query \\ %{}, headers \\ %{}) do
-    client.send(collection_path(collection) <> "/#{Utils.encode_path_segment(document_id)}", %{
+    Client.send(client, collection_path(collection) <> "/#{Utils.encode_path_segment(document_id)}", %{
       method: :delete,
       query: query,
       headers: headers
@@ -69,12 +69,12 @@ defmodule Bosbase.LLMDocumentService do
       |> maybe_put("page", page)
       |> maybe_put("perPage", per_page)
 
-    client.send(collection_path(collection), %{query: params, headers: headers})
+    Client.send(client, collection_path(collection), %{query: params, headers: headers})
   end
 
   def query(client, collection, options, query \\ %{}, headers \\ %{}) do
     path = collection_path(collection) <> "/documents/query"
-    client.send(path, %{method: :post, body: options, query: query, headers: headers})
+    Client.send(client, path, %{method: :post, body: options, query: query, headers: headers})
   end
 
   defp collection_path(collection) do

@@ -1,6 +1,6 @@
 defmodule Bosbase.FileService do
   @moduledoc "Utilities for working with files."
-  alias Bosbase.Utils
+  alias Bosbase.{Client, Utils}
 
   @doc """
   Builds the download URL for a record file.
@@ -28,7 +28,8 @@ defmodule Bosbase.FileService do
           |> maybe_put(opts, [:token, "token"], "token")
           |> maybe_put(opts, [:download, "download"], "download")
 
-        client.build_url(
+        Client.build_url(
+          client,
           "/api/files/#{Utils.encode_path_segment(collection)}/#{Utils.encode_path_segment(record_id)}/#{Utils.encode_path_segment(filename)}",
           params
         )
@@ -37,7 +38,7 @@ defmodule Bosbase.FileService do
 
   @doc "Requests a temporary file token."
   def get_token(client, body \\ %{}, query \\ %{}, headers \\ %{}) do
-    client.send("/api/files/token", %{method: :post, body: body, query: query, headers: headers})
+    Client.send(client, "/api/files/token", %{method: :post, body: body, query: query, headers: headers})
   end
 
   defp maybe_put(params, _opts, _keys, _target) when params == nil, do: params

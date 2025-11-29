@@ -234,7 +234,7 @@ defmodule Bosbase.RealtimeService do
       "subscriptions" => Map.keys(state.subscriptions)
     }
 
-    _ = state.client.send(@connect_path, %{method: :post, body: payload})
+    _ = Client.send(state.client, @connect_path, %{method: :post, body: payload})
     :ok
   end
 

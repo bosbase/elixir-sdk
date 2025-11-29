@@ -1,6 +1,6 @@
 # BosBase Elixir SDK
 
-Elixir client that mirrors the JavaScript SDK surface: collections and records, auth flows, realtime subscriptions, pub/sub websockets, batch requests, files, vectors, LangChaingo, LLM documents, cache, cron, backups, GraphQL, settings, logs, and health endpoints.
+Elixir client that mirrors the JavaScript SDK surface: collections and records, auth flows, realtime subscriptions, pub/sub websockets, batch requests, files, vectors, LangChaingo, LLM documents, cache, cron, backups, GraphQL, SQL execution, settings, logs, and health endpoints.
 
 ## Installation
 
@@ -38,6 +38,10 @@ file = %Bosbase.FileParam{filename: "avatar.png", content: File.read!("avatar.pn
 {:ok, created} =
   RecordService.new(client, "profiles")
   |> RecordService.create(%{body: %{"name" => "demo"}, files: %{"avatar" => file}})
+
+# execute a superuser SQL statement (via /api/sql/execute)
+{:ok, sql_result} =
+  Bosbase.sql().execute(client, "SELECT COUNT(*) AS total FROM users LIMIT 1")
 ```
 
 ## Services overview
@@ -52,6 +56,7 @@ file = %Bosbase.FileParam{filename: "avatar.png", content: File.read!("avatar.pn
 - `Bosbase.LangChaingoService` – completions, RAG, SQL helpers.
 - `Bosbase.CacheService` – named caches and entries.
 - `Bosbase.GraphQLService` – single-call GraphQL query helper.
+- `Bosbase.SQLService` – superuser-only SQL execution via `/api/sql/execute`.
 - `Bosbase.RealtimeService` – SSE subscriptions (server events).
 - `Bosbase.PubSubService` – WebSocket pub/sub publish + subscribe.
 

@@ -1,7 +1,7 @@
 defmodule Bosbase.CollectionService do
   @moduledoc "Admin collection helpers."
 
-  alias Bosbase.{BaseCrudService, ClientResponseError, Utils}
+  alias Bosbase.{BaseCrudService, Client, ClientResponseError, Utils}
 
   defstruct [:client, :crud]
 
@@ -32,7 +32,7 @@ defmodule Bosbase.CollectionService do
     path =
       "#{BaseCrudService.base_path(svc.crud)}/#{Utils.encode_path_segment(id_or_name)}/truncate"
 
-    svc.client.send(path, %{method: :delete, body: body, query: query, headers: headers})
+    Client.send(svc.client, path, %{method: :delete, body: body, query: query, headers: headers})
   end
 
   def import_collections(
@@ -49,7 +49,7 @@ defmodule Bosbase.CollectionService do
       |> Map.put("collections", collections)
       |> Map.put("deleteMissing", delete_missing)
 
-    svc.client.send(BaseCrudService.base_path(svc.crud) <> "/import", %{
+    Client.send(svc.client, BaseCrudService.base_path(svc.crud) <> "/import", %{
       method: :put,
       body: payload,
       query: query,
@@ -58,7 +58,7 @@ defmodule Bosbase.CollectionService do
   end
 
   def get_scaffolds(%__MODULE__{} = svc, body \\ %{}, query \\ %{}, headers \\ %{}) do
-    svc.client.send(BaseCrudService.base_path(svc.crud) <> "/meta/scaffolds", %{
+    Client.send(svc.client, BaseCrudService.base_path(svc.crud) <> "/meta/scaffolds", %{
       body: body,
       query: query,
       headers: headers
@@ -173,7 +173,7 @@ defmodule Bosbase.CollectionService do
   end
 
   def get_schema(%__MODULE__{} = svc, collection, query \\ %{}, headers \\ %{}) do
-    svc.client.send(
+    Client.send(svc.client, 
       "#{BaseCrudService.base_path(svc.crud)}/#{Utils.encode_path_segment(collection)}/schema",
       %{query: query, headers: headers}
     )

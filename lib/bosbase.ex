@@ -4,7 +4,7 @@ defmodule Bosbase do
 
   The API mirrors the JS SDK surface: construct a client with `new/2`, then access
   helpers like `collection/2`, `create_batch/1`, `files`, `realtime`, `pubsub`,
-  `vectors`, `llm_documents`, `langchaingo`, `graphql`, `settings`, `cache`, etc.
+  `vectors`, `llm_documents`, `langchaingo`, `graphql`, `settings`, `cache`, `sql`, etc.
   """
 
   alias Bosbase.Client
@@ -33,6 +33,7 @@ defmodule Bosbase do
   def vectors, do: Bosbase.VectorService
   def llm_documents, do: Bosbase.LLMDocumentService
   def langchaingo, do: Bosbase.LangChaingoService
+  def sql, do: Bosbase.SQLService
   def caches, do: Bosbase.CacheService
   def graphql, do: Bosbase.GraphQLService
   def collections, do: Bosbase.CollectionService

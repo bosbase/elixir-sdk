@@ -1,18 +1,19 @@
 defmodule Bosbase.SettingsService do
   @moduledoc "Settings management."
+  alias Bosbase.Client
 
   def get_all(client, query \\ %{}, headers \\ %{}) do
-    client.send("/api/settings", %{query: query, headers: headers})
+    Client.send(client, "/api/settings", %{query: query, headers: headers})
   end
 
   def update(client, body \\ %{}, query \\ %{}, headers \\ %{}) do
-    client.send("/api/settings", %{method: :patch, body: body, query: query, headers: headers})
+    Client.send(client, "/api/settings", %{method: :patch, body: body, query: query, headers: headers})
   end
 
   def test_s3(client, filesystem, body \\ %{}, query \\ %{}, headers \\ %{}) do
     payload = Map.put(Map.new(body || %{}), "filesystem", filesystem)
 
-    client.send("/api/settings/test/s3", %{
+    Client.send(client, "/api/settings/test/s3", %{
       method: :post,
       body: payload,
       query: query,
@@ -36,7 +37,7 @@ defmodule Bosbase.SettingsService do
       |> Map.put("template", template)
       |> maybe_put("collection", collection)
 
-    client.send("/api/settings/test/email", %{
+    Client.send(client, "/api/settings/test/email", %{
       method: :post,
       body: payload,
       query: query,
@@ -64,7 +65,7 @@ defmodule Bosbase.SettingsService do
       |> Map.put("privateKey", private_key)
       |> Map.put("duration", duration)
 
-    client.send("/api/settings/apple/generate-client-secret", %{
+    Client.send(client, "/api/settings/apple/generate-client-secret", %{
       method: :post,
       body: payload,
       query: query,

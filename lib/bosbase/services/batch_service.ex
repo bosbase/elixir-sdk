@@ -5,7 +5,7 @@ defmodule Bosbase.BatchService do
   Functional API: chain operations on the returned struct, then call `send/4`.
   """
 
-  alias Bosbase.Utils
+  alias Bosbase.{Client, Utils}
 
   defstruct [:client, requests: []]
 
@@ -130,7 +130,7 @@ defmodule Bosbase.BatchService do
       |> Map.new()
       |> Map.put("requests", Enum.reverse(requests_payload))
 
-    case client.send("/api/batch", %{
+    case Client.send(client, "/api/batch", %{
            method: :post,
            body: payload,
            query: query,

@@ -1,5 +1,6 @@
 defmodule Bosbase.GraphQLService do
   @moduledoc "Simple GraphQL helper."
+  alias Bosbase.Client
 
   def query(
         client,
@@ -22,7 +23,7 @@ defmodule Bosbase.GraphQLService do
         Map.put(payload, "operationName", operation_name)
       end
 
-    client.send("/api/graphql", %{
+    Client.send(client, "/api/graphql", %{
       method: :post,
       body: payload,
       query: query_params,

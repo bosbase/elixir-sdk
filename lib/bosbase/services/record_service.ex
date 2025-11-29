@@ -72,7 +72,7 @@ defmodule Bosbase.RecordService do
       |> maybe_put("expand", expand)
       |> maybe_put("fields", fields)
 
-    svc.client.send(base_collection_path(svc) <> "/count", %{query: params, headers: headers})
+    Client.send(svc.client, base_collection_path(svc) <> "/count", %{query: params, headers: headers})
   end
 
   def list_auth_methods(%__MODULE__{} = svc, fields \\ nil, query \\ %{}, headers \\ %{}) do
@@ -81,7 +81,7 @@ defmodule Bosbase.RecordService do
       |> Map.new()
       |> Map.put("fields", fields || "mfa,otp,password,oauth2")
 
-    svc.client.send(base_collection_path(svc) <> "/auth-methods", %{
+    Client.send(svc.client, base_collection_path(svc) <> "/auth-methods", %{
       query: params,
       headers: headers
     })
@@ -109,7 +109,7 @@ defmodule Bosbase.RecordService do
       |> maybe_put("expand", expand)
       |> maybe_put("fields", fields)
 
-    case svc.client.send(base_collection_path(svc) <> "/auth-with-password", %{
+    case Client.send(svc.client, base_collection_path(svc) <> "/auth-with-password", %{
            method: :post,
            body: payload,
            query: params,
@@ -148,7 +148,7 @@ defmodule Bosbase.RecordService do
       |> maybe_put("expand", expand)
       |> maybe_put("fields", fields)
 
-    case svc.client.send(base_collection_path(svc) <> "/auth-with-oauth2", %{
+    case Client.send(svc.client, base_collection_path(svc) <> "/auth-with-oauth2", %{
            method: :post,
            body: payload,
            query: params,
@@ -173,7 +173,7 @@ defmodule Bosbase.RecordService do
       |> maybe_put("expand", expand)
       |> maybe_put("fields", fields)
 
-    case svc.client.send(base_collection_path(svc) <> "/auth-refresh", %{
+    case Client.send(svc.client, base_collection_path(svc) <> "/auth-refresh", %{
            method: :post,
            body: body,
            query: params,
@@ -193,7 +193,7 @@ defmodule Bosbase.RecordService do
       ) do
     payload = body |> Map.new() |> Map.put("email", email)
 
-    svc.client.send(base_collection_path(svc) <> "/request-password-reset", %{
+    Client.send(svc.client, base_collection_path(svc) <> "/request-password-reset", %{
       method: :post,
       body: payload,
       query: query,
@@ -217,7 +217,7 @@ defmodule Bosbase.RecordService do
       |> Map.put("password", password)
       |> Map.put("passwordConfirm", password_confirm)
 
-    svc.client.send(base_collection_path(svc) <> "/confirm-password-reset", %{
+    Client.send(svc.client, base_collection_path(svc) <> "/confirm-password-reset", %{
       method: :post,
       body: payload,
       query: query,
@@ -228,7 +228,7 @@ defmodule Bosbase.RecordService do
   def request_verification(%__MODULE__{} = svc, email, body \\ %{}, query \\ %{}, headers \\ %{}) do
     payload = body |> Map.new() |> Map.put("email", email)
 
-    svc.client.send(base_collection_path(svc) <> "/request-verification", %{
+    Client.send(svc.client, base_collection_path(svc) <> "/request-verification", %{
       method: :post,
       body: payload,
       query: query,
@@ -239,7 +239,7 @@ defmodule Bosbase.RecordService do
   def confirm_verification(%__MODULE__{} = svc, token, body \\ %{}, query \\ %{}, headers \\ %{}) do
     payload = body |> Map.new() |> Map.put("token", token)
 
-    case svc.client.send(base_collection_path(svc) <> "/confirm-verification", %{
+    case Client.send(svc.client, base_collection_path(svc) <> "/confirm-verification", %{
            method: :post,
            body: payload,
            query: query,
@@ -263,7 +263,7 @@ defmodule Bosbase.RecordService do
       ) do
     payload = body |> Map.new() |> Map.put("newEmail", new_email)
 
-    svc.client.send(base_collection_path(svc) <> "/request-email-change", %{
+    Client.send(svc.client, base_collection_path(svc) <> "/request-email-change", %{
       method: :post,
       body: payload,
       query: query,
@@ -285,7 +285,7 @@ defmodule Bosbase.RecordService do
       |> Map.put("token", token)
       |> Map.put("password", password)
 
-    case svc.client.send(base_collection_path(svc) <> "/confirm-email-change", %{
+    case Client.send(svc.client, base_collection_path(svc) <> "/confirm-email-change", %{
            method: :post,
            body: payload,
            query: query,
@@ -303,7 +303,7 @@ defmodule Bosbase.RecordService do
   def request_otp(%__MODULE__{} = svc, email, body \\ %{}, query \\ %{}, headers \\ %{}) do
     payload = body |> Map.new() |> Map.put("email", email)
 
-    svc.client.send(base_collection_path(svc) <> "/request-otp", %{
+    Client.send(svc.client, base_collection_path(svc) <> "/request-otp", %{
       method: :post,
       body: payload,
       query: query,
@@ -333,7 +333,7 @@ defmodule Bosbase.RecordService do
       |> maybe_put("expand", expand)
       |> maybe_put("fields", fields)
 
-    case svc.client.send(base_collection_path(svc) <> "/auth-with-otp", %{
+    case Client.send(svc.client, base_collection_path(svc) <> "/auth-with-otp", %{
            method: :post,
            body: payload,
            query: params,
@@ -373,7 +373,7 @@ defmodule Bosbase.RecordService do
 
     new_client = Client.new(svc.client.base_url, lang: svc.client.lang)
 
-    case new_client.send(
+    case Client.send(new_client, 
            "#{base_collection_path(svc)}/impersonate/#{Utils.encode_path_segment(record_id)}",
            %{method: :post, body: payload, query: params, headers: enriched_headers}
          ) do

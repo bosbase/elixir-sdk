@@ -1,7 +1,7 @@
 defmodule Bosbase.LogService do
   @moduledoc "Access to server logs."
 
-  alias Bosbase.ClientResponseError
+  alias Bosbase.{Client, ClientResponseError}
 
   def get_list(
         client,
@@ -23,7 +23,7 @@ defmodule Bosbase.LogService do
       |> maybe_put("filter", filter)
       |> maybe_put("sort", sort)
 
-    client.send("/api/logs", %{query: params, headers: headers})
+    Client.send(client, "/api/logs", %{query: params, headers: headers})
   end
 
   def get_one(client, log_id, query \\ %{}, headers \\ %{})
@@ -32,17 +32,17 @@ defmodule Bosbase.LogService do
     do:
       {:error,
        %ClientResponseError{
-         url: client.build_url("/api/logs/", %{}),
+         url: Client.build_url(client, "/api/logs/", %{}),
          status: 404,
          response: %{"code" => 404, "message" => "Missing required log id.", "data" => %{}}
        }}
 
   def get_one(client, log_id, query, headers) do
-    client.send("/api/logs/#{log_id}", %{query: query, headers: headers})
+    Client.send(client, "/api/logs/#{log_id}", %{query: query, headers: headers})
   end
 
   def get_stats(client, query \\ %{}, headers \\ %{}) do
-    client.send("/api/logs/stats", %{query: query, headers: headers})
+    Client.send(client, "/api/logs/stats", %{query: query, headers: headers})
   end
 
   defp maybe_put(map, _key, nil), do: map

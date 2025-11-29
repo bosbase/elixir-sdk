@@ -1,6 +1,6 @@
 defmodule BosbaseTest do
   use ExUnit.Case
-  alias Bosbase.Client
+  alias Bosbase.{Client, ClientResponseError, SQLService}
 
   test "creates client with defaults" do
     client = Bosbase.new("http://127.0.0.1:8090", lang: "bg-BG")
@@ -17,5 +17,12 @@ defmodule BosbaseTest do
     client = Bosbase.new("http://example.com")
     url = Client.build_url(client, "/api/health", %{foo: "bar"})
     assert url == "http://example.com/api/health?foo=bar"
+  end
+
+  test "sql execute validates query" do
+    client = Bosbase.new("http://example.com")
+
+    assert {:error, %ClientResponseError{status: 400, response: %{"message" => "query is required"}}} =
+             SQLService.execute(client, "  ")
   end
 end

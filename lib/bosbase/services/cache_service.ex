@@ -1,9 +1,9 @@
 defmodule Bosbase.CacheService do
   @moduledoc "Cache service helpers."
-  alias Bosbase.Utils
+  alias Bosbase.{Client, Utils}
 
   def list(client, query \\ %{}, headers \\ %{}) do
-    client.send("/api/cache", %{query: query, headers: headers})
+    Client.send(client, "/api/cache", %{query: query, headers: headers})
   end
 
   def create(
@@ -24,11 +24,11 @@ defmodule Bosbase.CacheService do
       |> maybe_put("defaultTTLSeconds", default_ttl_seconds)
       |> maybe_put("readTimeoutMs", read_timeout_ms)
 
-    client.send("/api/cache", %{method: :post, body: payload, query: query, headers: headers})
+    Client.send(client, "/api/cache", %{method: :post, body: payload, query: query, headers: headers})
   end
 
   def update(client, name, body \\ %{}, query \\ %{}, headers \\ %{}) do
-    client.send("/api/cache/#{Utils.encode_path_segment(name)}", %{
+    Client.send(client, "/api/cache/#{Utils.encode_path_segment(name)}", %{
       method: :patch,
       body: body,
       query: query,
@@ -37,7 +37,7 @@ defmodule Bosbase.CacheService do
   end
 
   def delete(client, name, query \\ %{}, headers \\ %{}) do
-    client.send("/api/cache/#{Utils.encode_path_segment(name)}", %{
+    Client.send(client, "/api/cache/#{Utils.encode_path_segment(name)}", %{
       method: :delete,
       query: query,
       headers: headers
@@ -67,14 +67,14 @@ defmodule Bosbase.CacheService do
     path =
       "/api/cache/#{Utils.encode_path_segment(cache)}/entries/#{Utils.encode_path_segment(key)}"
 
-    client.send(path, %{method: :put, body: payload, query: query, headers: headers})
+    Client.send(client, path, %{method: :put, body: payload, query: query, headers: headers})
   end
 
   def get_entry(client, cache, key, query \\ %{}, headers \\ %{}) do
     path =
       "/api/cache/#{Utils.encode_path_segment(cache)}/entries/#{Utils.encode_path_segment(key)}"
 
-    client.send(path, %{query: query, headers: headers})
+    Client.send(client, path, %{query: query, headers: headers})
   end
 
   def renew_entry(
@@ -94,14 +94,14 @@ defmodule Bosbase.CacheService do
     path =
       "/api/cache/#{Utils.encode_path_segment(cache)}/entries/#{Utils.encode_path_segment(key)}"
 
-    client.send(path, %{method: :patch, body: payload, query: query, headers: headers})
+    Client.send(client, path, %{method: :patch, body: payload, query: query, headers: headers})
   end
 
   def delete_entry(client, cache, key, query \\ %{}, headers \\ %{}) do
     path =
       "/api/cache/#{Utils.encode_path_segment(cache)}/entries/#{Utils.encode_path_segment(key)}"
 
-    client.send(path, %{method: :delete, query: query, headers: headers})
+    Client.send(client, path, %{method: :delete, query: query, headers: headers})
     |> case do
       {:ok, _} -> :ok
       other -> other

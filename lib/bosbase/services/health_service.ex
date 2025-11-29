@@ -1,7 +1,8 @@
 defmodule Bosbase.HealthService do
   @moduledoc "Health check endpoints."
+  alias Bosbase.Client
 
   def check(client, query \\ %{}, headers \\ %{}) do
-    client.send("/api/health", %{query: query, headers: headers})
+    Client.send(client, "/api/health", %{query: query, headers: headers})
   end
 end
